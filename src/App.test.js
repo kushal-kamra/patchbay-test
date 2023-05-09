@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import UserEvent from '@testing-library/user-event';
 import App from './App';
 
@@ -27,7 +27,19 @@ describe('app', () => {
     const action = jest.spyOn(window, "open");
     const submit_button = screen.getByTestId('submit');
     UserEvent.click(submit_button);
-    expect(action).lastCalledWith("google.com");
+    expect(action).lastCalledWith("https://www.google.com", "chromeTab");
+  });
+
+  test('clicking on button should open new tab with the search term in google', async () => {
+    render(<App />);
+    const action = jest.spyOn(window, "open");
+    const submit_button = screen.getByTestId('submit');
+    const text_field = screen.getByTestId('input');
+    await act(async () => {
+      await UserEvent.type(text_field, "gmail");
+      await UserEvent.click(submit_button);
+    })
+    expect(action).lastCalledWith(`https://www.google.com/search?q=gmail`, "chromeTab");
   });
 
 })
